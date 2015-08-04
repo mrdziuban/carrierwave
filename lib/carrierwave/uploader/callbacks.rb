@@ -13,20 +13,20 @@ module CarrierWave
       end
 
       def with_callbacks(kind, *args)
-        self.class._before_callbacks[kind].each { |c| send c, *args }
+        self.class._before_callbacks[kind].each { |c| send c[0], *(args + c[1]) }
         yield
-        self.class._after_callbacks[kind].each { |c| send c, *args }
+        self.class._after_callbacks[kind].each { |c| send c[0], *(args + c[1]) }
       end
 
       module ClassMethods
-        def before(kind, callback)
+        def before(kind, callback, *callback_args)
           self._before_callbacks = self._before_callbacks.
-            merge kind => _before_callbacks[kind] + [callback]
+            merge kind => _before_callbacks[kind] + [[callback, callback_args]]
         end
 
-        def after(kind, callback)
+        def after(kind, callback, *callback_args)
           self._after_callbacks = self._after_callbacks.
-            merge kind => _after_callbacks[kind] + [callback]
+            merge kind => _after_callbacks[kind] + [[callback, callback_args]]
         end
       end # ClassMethods
 
